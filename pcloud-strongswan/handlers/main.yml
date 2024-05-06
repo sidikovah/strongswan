@@ -1,0 +1,9 @@
+---
+- name: Restart strongswan
+  service:
+    name: strongswan-starter
+    state: restarted
+
+- name: Reread ipsec.secrets
+  shell: ipsec rereadsecrets
+

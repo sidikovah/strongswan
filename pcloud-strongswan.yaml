@@ -1,0 +1,6 @@
+---
+- hosts: all
+  roles:
+  - pcloud-strongswan
+  become: true
+

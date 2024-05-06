@@ -1,0 +1,71 @@
+---
+- name: Update apt repo and cache
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+    cache_valid_time: 3600
+
+- name: Install strongswan packeges
+  apt:
+    name: "{{ packages }}"
+    state: present
+
+- name: Generate ipsec.conf
+  template:
+    src: ipsec.conf
+    dest: /etc/ipsec.conf
+  notify:
+    - Restart strongswan
+
+- name: Copy ipsec.secrets
+  template:
+    src: ipsec.secrets
+    dest: /etc/ipsec.secrets
+  notify:
+    - Reread ipsec.secrets
+
+- name: Strongswan started
+  service:
+    name: strongswan-starter
+    state: started
+
+- name: Set ipv4 forwarding on
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: true
+    state: present
+    reload: true
+
+- name: Set ipv6 forwarding on
+  sysctl:
+    name: net.ipv6.conf.all.forwarding
+    value: '1'
+    sysctl_set: true
+    state: present
+    reload: true
+
+- name: Set ipv4 accept_redirects off
+  sysctl:
+    name: net.ipv4.conf.all.accept_redirects
+    value: '0'
+    sysctl_set: true
+    state: present
+    reload: true
+
+- name: Set ipv6 sends_redirects off
+  sysctl:
+    name: net.ipv6.conf.all.send_redirects
+    value: '0'
+    sysctl_set: true
+    state: present
+    reload: true
+
+- name: Set no_pmtu_disc
+  sysctl:
+    name: net.ipv4.ip_no_pmtu_disc
+    value: '1'
+    sysctl_set: true
+    state: present
+    reload: true
+
